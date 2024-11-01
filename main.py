@@ -165,13 +165,11 @@ if (selected == 'Dataset'):
     x_test_norm_df = pd.DataFrame(x_test_norm, columns=[f'{col} (normalized)' for col in x_test.columns])
 
     # Display normalized data
-    combined_train = pd.concat([x_train, x_train_norm_df], axis=1)
-    st.subheader('Data Latih Sebelum dan Setelah Normalisasi')
-    st.write(combined_train)
+    st.subheader('Data Latih Setelah Normalisasi')
+    st.write(x_train_norm_df)
 
-    combined_test = pd.concat([x_test, x_test_norm_df], axis=1)
-    st.subheader('Data Testing Sebelum dan Setelah Normalisasi')
-    st.write(combined_test)
+    st.subheader('Data Latih Setelah Normalisasi')
+    st.write(x_train_norm_df)
 
 if (selected == 'Modelling'):
     
@@ -220,8 +218,16 @@ if (selected == 'Modelling'):
         'alpha': alpha,
         'mape': test_mape
     }
-    with open('elm_model_params.pkl', 'wb') as f:
-        pickle.dump(model_params, f)
+
+    if st.button('Perbarui Model'):
+        with open('elm_model_params.pkl', 'wb') as f:
+            pickle.dump(model_params, f)
+            st.success("Model berhasil disimpan.")
+    
+    with open('elm_model_params.pkl', 'rb') as f:
+        model_params = pickle.load(f)
+        test_mape = model_params['mape']
+        st.write("MAPE yang tersimpan : ", test_mape)
 
 # Add a new section to load the model from pickle if needed
 if selected == 'Prediction':
@@ -250,6 +256,6 @@ if selected == 'Prediction':
         # Display the prediction result
         st.write("Prediksi produksi padi (kw) : ")
         if prediction[0] < 0:
-            st.danger(prediction[0])
+            st.error(prediction[0])
         else:
             st.success(prediction[0])
